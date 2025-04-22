@@ -11,7 +11,7 @@
         <relativePath/> <!-- Lookup parent from repository -->
     </parent>
 
-    <groupId>com.example</groupId>
+    <groupId>com.akt</groupId>
     <artifactId>category-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Category Service</name>
