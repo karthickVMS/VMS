@@ -2,7 +2,7 @@ package com.akt.vms.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.akt.vms.dto.VehicleDTO;
 import com.akt.vms.entity.Vehicle;
 import com.akt.vms.repository.VehicleRepository;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class VehicleServiceTest {
@@ -121,37 +120,63 @@ public class VehicleServiceTest {
 		verify(vehicleRepository, times(1)).findById(1L);
 	}
 
+	/**
+	 * Unit test for the deleteVehicle method in VehicleService.
+	 *
+	 * <p>
+	 * This test verifies that when deleteVehicle is called with a given ID, the
+	 * repository's deleteById method is invoked exactly once with the same ID.
+	 */
 	@Test
-    void deleteVehicle_ShouldCallRepositoryDeleteById() {
-        Long vehicleId = 1L;
+	void deleteVehicle_ShouldCallRepositoryDeleteById() {
+		Long vehicleId = 1L;
 
-        vehicleService.deletevehicle(vehicleId);
+		vehicleService.deletevehicle(vehicleId);
 
-        verify(vehicleRepository, times(1)).deleteById(vehicleId);
-    }
+		verify(vehicleRepository, times(1)).deleteById(vehicleId);
+	}
+
+	/**
+	 * Unit test for updateVehicleFields method when update is successful.
+	 *
+	 * <p>
+	 * This test ensures that the service correctly calls the repository to update
+	 * model and fuelType using a custom update query and returns true when the
+	 * update affects at least one record.
+	 */
 	@Test
-    void updateVehicleFields_ShouldReturnTrue_WhenUpdateIsSuccessful() {
-        Long id = 1L;
-        String model = "Model Y";
-        String fuelType = "Electric";
+	void updateVehicleFields_ShouldReturnTrue_WhenUpdateIsSuccessful() {
+		Long id = 1L;
+		String model = "Model Y";
+		String fuelType = "Electric";
 
-        when(vehicleRepository.updateModelAndFuelTypeById(id, model, fuelType)).thenReturn(1);
+		when(vehicleRepository.updateModelAndFuelTypeById(id, model, fuelType)).thenReturn(1);
 
-        boolean result = vehicleService.updateVehicleFields(id, model, fuelType);
+		boolean result = vehicleService.updateVehicleFields(id, model, fuelType);
 
-        assertTrue(result);
-        verify(vehicleRepository, times(1)).updateModelAndFuelTypeById(id, model, fuelType);
-    }
+		assertTrue(result);
+		verify(vehicleRepository, times(1)).updateModelAndFuelTypeById(id, model, fuelType);
+	}
+
+	/**
+	 * Unit test for searchVehicles method in VehicleService.
+	 *
+	 * <p>
+	 * This test ensures that the service converts the search input to lowercase,
+	 * calls the repository method, and returns the expected list of matching
+	 * vehicles.
+	 */
 	@Test
 	void searchVehicles_ShouldReturnListOfVehicles() {
-	    String searchValue = "ABC";
-	    List<Vehicle> vehicles = List.of(new Vehicle(), new Vehicle());
+		String searchValue = "ABC";
+		List<Vehicle> vehicles = List.of(new Vehicle(), new Vehicle());
 
-	    when(vehicleRepository.searchVehicles(searchValue.toLowerCase())).thenReturn(vehicles);
+		when(vehicleRepository.searchVehicles(searchValue.toLowerCase())).thenReturn(vehicles);
 
-	    List<Vehicle> result = vehicleService.searchVehicles(searchValue);
+		List<Vehicle> result = vehicleService.searchVehicles(searchValue);
 
-	    assertEquals(2, result.size());
-	    verify(vehicleRepository, times(1)).searchVehicles("abc");
+		assertEquals(2, result.size());
+		verify(vehicleRepository, times(1)).searchVehicles("abc");
 	}
+
 }
