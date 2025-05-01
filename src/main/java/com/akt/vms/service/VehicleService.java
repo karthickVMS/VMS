@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ public class VehicleService {
 	// automatically injects an instance of VehicleRepository
 	private VehicleRepository vehicleRepository;// gives access to methods like findAll, save, delete, etc.
 
-	@Autowired
 	public VehicleService(VehicleRepository vehicleRepository) {
 		this.vehicleRepository = vehicleRepository;
 	}
@@ -106,6 +104,24 @@ public class VehicleService {
 		logger.info("Vehicle with ID {} deleted", id);
 	}
 
+	/**
+	 * Searches for vehicles based on the non-null fields provided in the
+	 * {@link VehicleDTO}.
+	 *
+	 * <p>
+	 * This method supports flexible filtering by accepting a DTO with optional
+	 * search fields. If all fields in the DTO are null, it returns all vehicles.
+	 * Otherwise, it forwards the non-null fields to a custom repository method for
+	 * filtered querying.
+	 *
+	 * <p>
+	 * Logged messages help trace whether a full search or a filtered search is
+	 * being executed.
+	 *
+	 * @param vehicleDTO the Data Transfer Object containing optional search
+	 *                   criteria
+	 * @return a list of {@link Vehicle} entities that match the search criteria
+	 */
 	public List<Vehicle> searchVehicles(VehicleDTO vehicleDTO) {
 		logger.info("Searching vehicles with filters: {}", vehicleDTO);
 		boolean isAllNull = vehicleDTO.getVehicleNumber() == null && vehicleDTO.getModel() == null
@@ -139,6 +155,17 @@ public class VehicleService {
 
 	}
 
+	/**
+	 * Searches for vehicles using a case-insensitive keyword.
+	 *
+	 * <p>
+	 * This method logs the search keyword and delegates the search operation to the
+	 * repository layer. It converts the input value to lowercase to ensure a
+	 * case-insensitive match.
+	 *
+	 * @param searchvalue the keyword or phrase to search for in vehicle records
+	 * @return a list of {@link Vehicle} entities matching the search criteria
+	 */
 	public List<Vehicle> searchVehicles(String searchvalue) {
 		logger.info("Initiating search for vehicles with value: {}", searchvalue);
 		return vehicleRepository.searchVehicles(searchvalue.toLowerCase());
