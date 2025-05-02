@@ -42,7 +42,4 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSp
     @Query("SELECT c FROM Customer c WHERE LOWER(c.customerName) = LOWER(:customerName)")
     List<Customer> findByCustomerNameIgnoreCaseCustom(@Param("customerName") String customerName);
 
-
-	Object searchCustomers(String lowerCase);
-
 }
