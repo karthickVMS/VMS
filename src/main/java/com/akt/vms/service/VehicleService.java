@@ -55,7 +55,7 @@ public class VehicleService {
 	 * @return List of all vehicle DTOs.
 	 */
 	@Cacheable("vehicles")
-	public List<VehicleDTO> getAllvehicles() {
+	public List<VehicleDTO> getAllVehicles() {
 		logger.info("VehicleService :: getAllvehicles");
 		try {
 			logger.debug("VehicleService, Debug");

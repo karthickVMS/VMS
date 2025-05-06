@@ -26,11 +26,10 @@ public class DriverService {
 	private static final Logger logger = LoggerFactory.getLogger(DriverService.class);
 
 	@Autowired
-
 	private final DriverRepository driverRepository;
 
 	@Autowired
-	private final DriverMapper driverMapper;
+	private DriverMapper driverMapper;
 
 	public DriverService(DriverRepository driverRepository, DriverMapper driverMapper) {
 		this.driverRepository = driverRepository;
@@ -44,7 +43,7 @@ public class DriverService {
 	 */
 	public List<DriverDTO> getAllDrivers() {
 		return driverRepository.findAll().stream() // Fetch all Driver entities
-				.map(DriverMapper::toDriverDTO) // Convert each entity to DTO
+				.map(driverMapper::toDriverDTO) // Convert each entity to DTO
 				.collect(Collectors.toList()); // Collect results into a list
 	}
 
@@ -57,7 +56,7 @@ public class DriverService {
 	 */
 	public DriverDTO getDriverById(Long id) {
 		return driverRepository.findById(id) // Try to find driver by ID
-				.map(DriverMapper::toDriverDTO) // Convert to DTO if found
+				.map(driverMapper::toDriverDTO) // Convert to DTO if found
 				.orElse(null); // Return null if not found
 	}
 
@@ -70,7 +69,7 @@ public class DriverService {
 	public DriverDTO createDriver(DriverDTO driverDTO) {
 		Driver driver = driverMapper.toEntity(driverDTO); // Convert DTO to entity
 		driver = driverRepository.save(driver); // Save to DB(driver object updated in the repository)
-		return DriverMapper.toDriverDTO(driver); // Convert entity object to DTO
+		return driverMapper.toDriverDTO(driver); // Convert entity object to DTO
 	}
 
 	/**

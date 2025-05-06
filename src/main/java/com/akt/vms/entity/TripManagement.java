@@ -36,7 +36,7 @@ public class TripManagement extends Auditable {
 	private LocalDateTime startTime;
 
 	@Column(name = "end_time")
-	private LocalDateTime endTime;
+	private LocalDateTime endTime; 
 
 	@Column(name = "status")
 	private String status;

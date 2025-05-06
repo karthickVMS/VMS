@@ -128,7 +128,7 @@ public class DriverController {
 	 * does not provide a value for a specific parameter, it will be null.
 	 */
 
-	@GetMapping("/specificationSearch")
+	@PostMapping("/specificationSearch")
 	public ResponseEntity<List<Driver>> specificationFilterDrivers(@RequestBody DriverFilterRequest filterRequest) {
 		logger.info("Received driver search request with filters: {}", filterRequest);
 

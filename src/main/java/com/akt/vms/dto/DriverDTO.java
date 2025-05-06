@@ -10,6 +10,8 @@ public class DriverDTO {
 	private Integer yearsOfExp;
 	private String state;
 
+	private AddressDTO address;
+
 	public Long getId() {
 		return id;
 	}
@@ -64,6 +66,14 @@ public class DriverDTO {
 
 	public void setState(String state) {
 		this.state = state;
+	}
+
+	public AddressDTO getAddress() {
+		return address;
+	}
+
+	public void setAddress(AddressDTO address) {
+		this.address = address;
 	}
 
 }

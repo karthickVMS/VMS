@@ -2,7 +2,9 @@ package com.akt.vms.mapper;
 
 import org.springframework.stereotype.Component;
 
+import com.akt.vms.dto.AddressDTO;
 import com.akt.vms.dto.DriverDTO;
+import com.akt.vms.entity.Address;
 import com.akt.vms.entity.Driver;
 
 @Component
@@ -14,7 +16,7 @@ public class DriverMapper {
 	 * @param driver - the Driver entity to convert
 	 * @return DriverDTO - the converted DTO object
 	 */
-	public static DriverDTO toDriverDTO(Driver driver) {
+	public DriverDTO toDriverDTO(Driver driver) {
 		if (driver == null) {
 			return null;
 		}
@@ -28,6 +30,14 @@ public class DriverMapper {
 		driverDTO.setYearsOfExp(driver.getYearsOfExp());
 		driverDTO.setState(driver.getState());
 
+		if (driver.getAddress() != null) {
+			AddressDTO addressDto = new AddressDTO();
+			addressDto.setAddress_id(String.valueOf(driver.getAddress().getAddressId()));
+			addressDto.setAddress_line1(driver.getAddress().getAddressLine1());
+			addressDto.setAddress_line2(driver.getAddress().getAddressLine2());
+			addressDto.setCity(driver.getAddress().getCity());
+			driverDTO.setAddress(addressDto);
+		}
 		return driverDTO;
 	}
 
@@ -51,6 +61,15 @@ public class DriverMapper {
 		driver.setYearsOfExp(dto.getYearsOfExp());
 		driver.setState(dto.getState());
 
+		if (dto.getAddress() != null) {
+			Address address = new Address();
+			address.setAddressId(
+					dto.getAddress().getAddress_id() == null ? null : Long.valueOf(dto.getAddress().getAddress_id()));
+			address.setAddressLine1(dto.getAddress().getAddress_line1());
+			address.setAddressLine2(dto.getAddress().getAddress_line2());
+			address.setCity(dto.getAddress().getCity());
+			driver.setAddress(address);
+		}
 		return driver;
 	}
 

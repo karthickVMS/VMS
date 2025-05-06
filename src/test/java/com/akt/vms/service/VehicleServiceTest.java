@@ -90,7 +90,7 @@ public class VehicleServiceTest {
 		List<Vehicle> vehicles = Arrays.asList(vehicle);
 		when(vehicleRepository.findAll()).thenReturn(vehicles);
 
-		List<VehicleDTO> result = vehicleService.getAllvehicles();
+		List<VehicleDTO> result = vehicleService.getAllVehicles();
 
 		assertNotNull(result);
 		assertEquals(1, result.size());
