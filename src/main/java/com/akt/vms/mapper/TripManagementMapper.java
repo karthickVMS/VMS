@@ -2,16 +2,30 @@ package com.akt.vms.mapper;
 
 import java.time.Duration;
 
-import com.akt.vms.dto.DriverDTO;
-import com.akt.vms.dto.TripManagementDTO;
-import com.akt.vms.dto.VehicleDTO;
-import com.akt.vms.entity.Driver;
-import com.akt.vms.entity.TripManagement;
-import com.akt.vms.entity.Vehicle;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import com.akt.vms.dto.TripManagementDTO;
+import com.akt.vms.entity.TripManagement;
+import com.akt.vms.repository.DriverRepository;
+import com.akt.vms.repository.VehicleRepository;
+
+@Component
 public class TripManagementMapper {
 
-	public static TripManagementDTO toDTO(TripManagement tripManagement) {
+	@Autowired
+	private DriverRepository driverRepository;
+
+	@Autowired
+	private VehicleRepository vehicleRepository;
+
+	@Autowired
+	private DriverMapper driverMapper;
+
+	@Autowired
+	private VehicleMapper vehicleMapper;
+
+	public TripManagementDTO toDTO(TripManagement tripManagement) {
 		TripManagementDTO dto = new TripManagementDTO();
 		dto.setTripManagementId(tripManagement.getTripManagementId());
 		dto.setTripName(tripManagement.getTripName());
@@ -21,25 +35,18 @@ public class TripManagementMapper {
 		dto.setEndTime(tripManagement.getEndTime());
 		dto.setStatus(tripManagement.getStatus());
 
-		// Map Driver and Vehicle DTOs
 		if (tripManagement.getDriver() != null) {
-			DriverDTO driverDTO = new DriverDTO();
-			driverDTO.setId(tripManagement.getDriver().getDriverId());
-			driverDTO.setName(tripManagement.getDriver().getName());
-			dto.setDriver(driverDTO);
+			dto.setDriver(driverMapper.toDriverDTO(tripManagement.getDriver()));
 		}
 
 		if (tripManagement.getVehicle() != null) {
-			VehicleDTO vehicleDTO = new VehicleDTO();
-			vehicleDTO.setId(tripManagement.getVehicle().getId());
-			vehicleDTO.setVehicleNumber(tripManagement.getVehicle().getVehicleNumber());
-			dto.setVehicle(vehicleDTO);
+			dto.setVehicle(vehicleMapper.toDto(tripManagement.getVehicle()));
 		}
 
 		return dto;
 	}
 
-	public static TripManagement toEntity(TripManagementDTO dto) {
+	public TripManagement toEntity(TripManagementDTO dto) {
 		TripManagement tripManagement = new TripManagement();
 		tripManagement.setTripManagementId(dto.getTripManagementId());
 		tripManagement.setTripName(dto.getTripName());
@@ -49,23 +56,13 @@ public class TripManagementMapper {
 		tripManagement.setEndTime(dto.getEndTime());
 		tripManagement.setStatus(dto.getStatus());
 
-		// Map Driver and Vehicle entities if present
-		if (dto.getDriver() != null) {
-			Driver driver = new Driver();
-			driver.setDriverId(dto.getDriver().getId());
-			tripManagement.setDriver(driver);
-		}
-
-		if (dto.getVehicle() != null) {
-			Vehicle vehicle = new Vehicle();
-			vehicle.setId(dto.getVehicle().getId());
-			tripManagement.setVehicle(vehicle);
-		}
+		tripManagement.setDriver(driverRepository.findById(dto.getDriverID()).get());
+		tripManagement.setVehicle(vehicleRepository.findById(dto.getVehicleID()).get());
 
 		return tripManagement;
 	}
 
-	public static long calculateDuration(TripManagement tripManagement) {
+	public long calculateDuration(TripManagement tripManagement) {
 		if (tripManagement.getStartTime() != null && tripManagement.getEndTime() != null) {
 			Duration duration = Duration.between(tripManagement.getStartTime(), tripManagement.getEndTime());
 			return duration.toMinutes();
@@ -75,7 +72,7 @@ public class TripManagementMapper {
 
 	// Implement a method for distance calculation (can be based on some API or
 	// logic)
-	public static double calculateDistance(String startLocation, String endLocation) {
+	public double calculateDistance(String startLocation, String endLocation) {
 		// Example: Use some geolocation API or custom logic to calculate the distance
 		return 100.0; // Example static distance
 	}

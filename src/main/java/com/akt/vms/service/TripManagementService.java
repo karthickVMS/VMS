@@ -1,6 +1,8 @@
 package com.akt.vms.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,12 +21,21 @@ public class TripManagementService {
 	@Autowired
 	private TripManagementRepository tripManagementRepository;
 
+	@Autowired
+	private TripManagementMapper tripManagementMapper;
+
+	@Transactional
+	public List<TripManagementDTO> getAllTrips() {
+		return tripManagementRepository.findAll().stream().map(tripManagementMapper::toDTO)
+				.collect(Collectors.toList());
+	}
+
 	@Transactional
 	public TripManagementDTO createTrip(TripManagementDTO tripManagementDTO) {
-		TripManagement tripManagement = TripManagementMapper.toEntity(tripManagementDTO);
+		TripManagement tripManagement = tripManagementMapper.toEntity(tripManagementDTO);
 		tripManagement.setStatus("PENDING");
 		tripManagement = tripManagementRepository.save(tripManagement);
-		return TripManagementMapper.toDTO(tripManagement);
+		return tripManagementMapper.toDTO(tripManagement);
 	}
 
 	@Transactional
@@ -40,7 +51,7 @@ public class TripManagementService {
 		trip.setStatus("IN_PROGRESS");
 		trip = tripManagementRepository.save(trip);
 
-		return TripManagementMapper.toDTO(trip);
+		return tripManagementMapper.toDTO(trip);
 	}
 
 	@Transactional
@@ -56,16 +67,17 @@ public class TripManagementService {
 		trip.setStatus("COMPLETED");
 		trip = tripManagementRepository.save(trip);
 
-		return TripManagementMapper.toDTO(trip);
+		return tripManagementMapper.toDTO(trip);
 	}
 
 	public TripSummaryDTO getTripSummary(Long id) {
 		TripManagement trip = tripManagementRepository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("Trip not found"));
+				.orElseThrow(() -> new IllegalArgumentException("Trip not found with ID: " + id));
 
-		long duration = TripManagementMapper.calculateDuration(trip);
-		double distance = TripManagementMapper.calculateDistance(trip.getStartLocation(), trip.getEndLocation());
+		long duration = tripManagementMapper.calculateDuration(trip);
+		double distance = tripManagementMapper.calculateDistance(trip.getStartLocation(), trip.getEndLocation());
 
+		// Create and return TripSummaryDTO
 		TripSummaryDTO summary = new TripSummaryDTO();
 		summary.setTripId(id);
 		summary.setDuration(duration);

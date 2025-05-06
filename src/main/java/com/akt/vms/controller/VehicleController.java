@@ -55,8 +55,9 @@ public class VehicleController {
 	@GetMapping
 	public ResponseEntity<List<VehicleDTO>> getAllvehicles() {
 		logger.info("VehicleController :: getAllvehicles");
-		return ResponseEntity.ok(vehicleService.getAllvehicles());
+		return ResponseEntity.ok(vehicleService.getAllVehicles());
 	}
+	
 
 	/**
 	 * Deletes a vehicle by ID.

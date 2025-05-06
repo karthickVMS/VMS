@@ -1,7 +1,5 @@
 package com.akt.vms.mapper;
 
-
-
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

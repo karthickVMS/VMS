@@ -1,5 +1,7 @@
 package com.akt.vms.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,11 @@ public class TripManagementController {
 
 	@Autowired
 	private TripManagementService tripManagementService;
+
+	@GetMapping
+	public List<TripManagementDTO> getAllTrips() {
+	    return tripManagementService.getAllTrips();
+	}
 
 	@PostMapping
 	public TripManagementDTO createTrip(@RequestBody TripManagementDTO tripManagementDTO) {
