@@ -12,25 +12,31 @@ import org.springframework.stereotype.Service;
 
 import com.akt.vms.dto.VehicleAssignDTO;
 import com.akt.vms.entity.Driver;
+import com.akt.vms.entity.TripManagement;
 import com.akt.vms.entity.Vehicle;
 import com.akt.vms.entity.VehicleAssign;
 import com.akt.vms.mapper.VehicleAssignMapper;
 import com.akt.vms.repository.DriverRepository;
+import com.akt.vms.repository.TripManagementRepository;
 import com.akt.vms.repository.VehicleAssignRepository;
 import com.akt.vms.repository.VehicleRepository;
+
 @Service
 public class VehicleAssignService {
 
-    private final DriverRepository driverRepository;
+	private final DriverRepository driverRepository;
 	private static final Logger logger = LoggerFactory.getLogger(VehicleAssignService.class);
+	private final TripManagementRepository tripRepository;
 
 	private final VehicleAssignRepository vehicleAssignRepository;
 	private final VehicleRepository vehicleRepository;
 
-	public VehicleAssignService(VehicleAssignRepository vehicleAssignRepository, VehicleRepository vehicleRepository, DriverRepository driverRepository) {
+	public VehicleAssignService(VehicleAssignRepository vehicleAssignRepository, VehicleRepository vehicleRepository,
+			DriverRepository driverRepository, TripManagementRepository tripRepository) {
 		this.vehicleAssignRepository = vehicleAssignRepository;
 		this.vehicleRepository = vehicleRepository;
 		this.driverRepository = driverRepository;
+		this.tripRepository = tripRepository;
 	}
 
 	/**
@@ -41,17 +47,34 @@ public class VehicleAssignService {
 	 */
 	public VehicleAssignDTO createVehicleAssign(VehicleAssignDTO dto) {
 		logger.info("Creating new vehicle assignment");
+
 		Optional<Vehicle> vehicleOpt = vehicleRepository.findById(dto.getVehicleid());
-		Optional<Driver>driverOpt=driverRepository.findById(dto.getDriver_id());
+		Optional<Driver> driverOpt = driverRepository.findById(dto.getDriver_id());
+		Optional<TripManagement> tripOpt = Optional.empty();
+
+		if (dto.getTripManagementId() != null) {
+			tripOpt = tripRepository.findById(dto.getTripManagementId());
+			if (!tripOpt.isPresent()) {
+				logger.error("Trip not found with ID: {}", dto.getTripManagementId());
+				throw new RuntimeException("Trip not found with ID: " + dto.getTripManagementId());
+			}
+		}
 
 		if (!vehicleOpt.isPresent()) {
 			logger.error("Vehicle not found with ID: {}", dto.getVehicleid());
 			throw new RuntimeException("Vehicle not found with ID: " + dto.getVehicleid());
 		}
 
-		VehicleAssign entity = VehicleAssignMapper.toEntity(dto, vehicleOpt.get(),driverOpt.get());
+		if (!driverOpt.isPresent()) {
+			logger.error("Driver not found with ID: {}", dto.getDriver_id());
+			throw new RuntimeException("Driver not found with ID: " + dto.getDriver_id());
+		}
+
+		VehicleAssign entity = VehicleAssignMapper.toEntity(dto, vehicleOpt.get(), driverOpt.get(),
+				tripOpt.orElse(null));
 		VehicleAssign saved = vehicleAssignRepository.save(entity);
 		logger.info("Vehicle assignment saved with ID: {}", saved.getVehicleAssignId());
+
 		return VehicleAssignMapper.toDTO(saved);
 	}
 

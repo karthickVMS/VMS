@@ -2,12 +2,13 @@ package com.akt.vms.mapper;
 
 import com.akt.vms.dto.VehicleAssignDTO;
 import com.akt.vms.entity.Driver;
+import com.akt.vms.entity.TripManagement;
 import com.akt.vms.entity.Vehicle;
 import com.akt.vms.entity.VehicleAssign;
 
 public class VehicleAssignMapper {
-	public static VehicleAssign toEntity(VehicleAssignDTO dto, Vehicle vehicle, Driver driver) {
-		if (dto == null || vehicle == null || driver == null) {
+	public static VehicleAssign toEntity(VehicleAssignDTO dto, Vehicle vehicle, Driver driver, TripManagement trip) {
+		if (dto == null || vehicle == null || driver == null|| trip==null) {
 			return null;
 		}
 
@@ -17,6 +18,7 @@ public class VehicleAssignMapper {
 		assign.setRemarks(dto.getRemarks());
 		assign.setVehicle(vehicle);
 		assign.setDriver(driver);
+		assign.setTrip(trip);
 		return assign;
 	}
 
@@ -30,6 +32,7 @@ public class VehicleAssignMapper {
 		dto.setVehicleid(assign.getVehicle().getId()); // extract vehicle ID
 		dto.setDriver_id(assign.getDriver().getDriverId());
 		dto.setRemarks(assign.getRemarks());
+		dto.setTripManagementId(assign.getTrip()!=null?assign.getTrip().getTripManagementId():null);
 		return dto;
 	}
 }

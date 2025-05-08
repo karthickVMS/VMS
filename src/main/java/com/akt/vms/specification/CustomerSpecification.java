@@ -1,4 +1,4 @@
-package com.akt.vms.specifications;
+package com.akt.vms.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.akt.vms.entity.Customer;

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,12 +16,9 @@ import com.akt.vms.dto.CustomerDTO;
 import com.akt.vms.entity.Customer;
 import com.akt.vms.mapper.CustomerMapper;
 import com.akt.vms.repository.CustomerRepository;
-import com.akt.vms.specifications.CustomerSpecification;
+import com.akt.vms.specification.CustomerSpecification;
 
 import jakarta.persistence.criteria.Predicate;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class CustomerService {

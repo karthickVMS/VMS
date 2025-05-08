@@ -7,12 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.akt.vms.dto.VehicleDTO;
 import com.akt.vms.entity.Vehicle;
 import com.akt.vms.mapper.VehicleMapper;
 import com.akt.vms.repository.VehicleRepository;
+import com.akt.vms.specification.VehicleSpecification;
+
 
 @Service
 public class VehicleService {
@@ -171,5 +174,12 @@ public class VehicleService {
 		return vehicleRepository.searchVehicles(searchvalue.toLowerCase());
 
 	}
-
+	public List<Vehicle> specificationFilterVehicles(VehicleDTO vehicleDTO) {
+        String searchValue = getSearchValue(vehicleDTO);
+        Specification<Vehicle> spec = VehicleSpecification.getvehicleSpecification(searchValue);
+        return vehicleRepository.findAll(spec);
+    }
+	private String getSearchValue(VehicleDTO dto) {
+        return dto != null ? dto.getVehicleNumber() : null;
+    }
 }

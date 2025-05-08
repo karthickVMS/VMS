@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,6 +27,17 @@ public class VehicleAssign extends Auditable {
 	@ManyToOne
 	@JoinColumn(name = "driver_id", nullable = false)
 	private Driver driver;
+	@OneToOne
+	@JoinColumn(name = "tripManagementId")
+	private TripManagement trip;
+
+	public TripManagement getTrip() {
+		return trip;
+	}
+
+	public void setTrip(TripManagement trip) {
+		this.trip = trip;
+	}
 
 	public Driver getDriver() {
 		return driver;

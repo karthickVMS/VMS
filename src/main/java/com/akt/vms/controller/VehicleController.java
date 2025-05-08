@@ -57,7 +57,6 @@ public class VehicleController {
 		logger.info("VehicleController :: getAllvehicles");
 		return ResponseEntity.ok(vehicleService.getAllVehicles());
 	}
-	
 
 	/**
 	 * Deletes a vehicle by ID.
@@ -82,7 +81,7 @@ public class VehicleController {
 	public ResponseEntity<VehicleDTO> getVehicleById(@PathVariable Long id) {
 		logger.info("Fetch vehicle with ID: {}", id);
 		VehicleDTO vehicleDTO = vehicleService.getVehicleById(id);
-		if(vehicleDTO == null) {
+		if (vehicleDTO == null) {
 			return ResponseEntity.notFound().build();
 		}
 		return ResponseEntity.ok(vehicleDTO);
@@ -128,5 +127,12 @@ public class VehicleController {
 			return ResponseEntity.ok("vehicle id not found");
 		}
 
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<List<Vehicle>> searchVehicles(@RequestParam String searchvalue) {
+		logger.info("Received search request with value: {}", searchvalue);
+		List<Vehicle> results = vehicleService.searchVehicles(searchvalue);
+		return ResponseEntity.ok(results);
 	}
 }

@@ -5,6 +5,23 @@ public class VehicleAssignDTO {
 	private Long vehicle_id;
 	private Long driver_id;
 	private String remarks;
+	private Long tripManagementId;
+
+	public Long getVehicle_id() {
+		return vehicle_id;
+	}
+
+	public void setVehicle_id(Long vehicle_id) {
+		this.vehicle_id = vehicle_id;
+	}
+
+	public Long getTripManagementId() {
+		return tripManagementId;
+	}
+
+	public void setTripManagementId(Long tripManagementId) {
+		this.tripManagementId = tripManagementId;
+	}
 
 	public Long getVehicleAssignId() {
 		return vehicleAssignId;
