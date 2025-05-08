@@ -26,6 +26,10 @@ public class CategoryController {
 	private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
     private final CategoryService categoryService;
 
+    /**
+     * 
+     * @param categoryService
+     */
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }

@@ -24,6 +24,7 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/dealer/**").hasAnyAuthority("DEALER", "ADMIN")
                 .requestMatchers("/driver/**").hasAnyAuthority("DRIVER", "ADMIN")
+                .requestMatchers("/api/trips/**").hasAnyAuthority("DRIVER", "ADMIN")
                 .requestMatchers("/user/**").hasAnyAuthority("USER", "ADMIN")
                 .anyRequest().hasAuthority("ADMIN") // fallback: only ADMIN can access other unknown routes
             )

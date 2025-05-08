@@ -14,6 +14,7 @@
     <groupId>com.akt</groupId>
     <artifactId>vms-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
     <name>Category Service</name>
     <description>Spring Boot Category Module</description>
 
