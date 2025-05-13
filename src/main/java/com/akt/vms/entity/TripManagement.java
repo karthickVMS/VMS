@@ -1,17 +1,22 @@
 package com.akt.vms.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,6 +26,7 @@ public class TripManagement extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "trip_management_id", nullable = false)
 	private Long tripManagementId;
 
 	@Column(name = "trip_name", nullable = false)
@@ -36,7 +42,7 @@ public class TripManagement extends Auditable {
 	private LocalDateTime startTime;
 
 	@Column(name = "end_time")
-	private LocalDateTime endTime; 
+	private LocalDateTime endTime;
 
 	@Column(name = "status")
 	private String status;
@@ -48,6 +54,9 @@ public class TripManagement extends Auditable {
 	@ManyToOne
 	@JoinColumn(name = "vehicle_id")
 	private Vehicle vehicle;
+
+	@OneToMany(mappedBy = "tripManagement", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private List<RouteMapping> routeMappings = new ArrayList<>();
 
 	public Long getTripManagementId() {
 		return tripManagementId;
@@ -114,11 +123,19 @@ public class TripManagement extends Auditable {
 	}
 
 	public String getStatus() {
-        return status;
-    }
+		return status;
+	}
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public List<RouteMapping> getRouteMappingList() {
+		return routeMappings;
+	}
+
+	public void setRouteMappingList(List<RouteMapping> routeMappingList) {
+		this.routeMappings = routeMappingList;
+	}
 
 }
