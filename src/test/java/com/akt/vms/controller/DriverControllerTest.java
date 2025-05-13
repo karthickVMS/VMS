@@ -112,7 +112,7 @@ public class DriverControllerTest implements WebMvcConfigurer {
 
 	@Test
 	void deleteDriver_ShouldReturnNoContent() throws Exception {
-		doNothing().when(driverService).deleteDriver(1L);
+		when(driverService.deleteDriver(1L)).thenReturn(true); // or proper return value
 
 		mockMvc.perform(delete("/driver/1")).andExpect(status().isNoContent());
 

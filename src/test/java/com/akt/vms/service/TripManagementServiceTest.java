@@ -1,16 +1,18 @@
 package com.akt.vms.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
-
-import com.akt.vms.dto.TripManagementDTO;
-import com.akt.vms.dto.TripSummaryDTO;
-import com.akt.vms.entity.TripManagement;
-import com.akt.vms.mapper.TripManagementMapper;
-import com.akt.vms.repository.TripManagementRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.akt.vms.dto.TripManagementDTO;
+import com.akt.vms.dto.TripSummaryDTO;
+import com.akt.vms.entity.Driver;
+import com.akt.vms.entity.RouteMapping;
+import com.akt.vms.entity.TripManagement;
+import com.akt.vms.entity.Vehicle;
+import com.akt.vms.mapper.TripManagementMapper;
+import com.akt.vms.repository.TripManagementRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class TripManagementServiceTest {
@@ -34,6 +45,7 @@ public class TripManagementServiceTest {
 
 	private TripManagement tripEntity;
 	private TripManagementDTO tripDTO;
+	RouteMapping mapping = new RouteMapping();
 
 	@BeforeEach
 	void setUp() {
@@ -194,5 +206,56 @@ public class TripManagementServiceTest {
 		});
 
 		verify(tripManagementRepository, times(1)).findById(1L);
+	}
+
+	@Test
+	void getTripSummary_ShouldReturnSummary_WhenTripExists() {
+		tripEntity.setStartTime(LocalDateTime.now().minusHours(1));
+		tripEntity.setEndTime(LocalDateTime.now());
+		tripEntity.setStatus("COMPLETED");
+		tripEntity.setStartLocation("Chennai");
+		tripEntity.setEndLocation("Bangalore");
+
+		Driver driver = new Driver();
+		driver.setDriverId(1L);
+		driver.setName("Raja");
+		tripEntity.setDriver(driver);
+
+		Vehicle vehicle = new Vehicle();
+		vehicle.setId(1L);
+		vehicle.setVehicleNumber("VEH1234");
+		tripEntity.setVehicle(vehicle);
+
+		RouteMapping routeMapping = new RouteMapping();
+		routeMapping.setRouteMappingId(101L);
+		routeMapping.setPointName("Point A");
+		routeMapping.setReachedTime(LocalDateTime.now().minusMinutes(45));
+		mapping.setStatus(RouteMapping.Status.REACHED); // ✅ This is correct
+
+		tripEntity.setRouteMappingList(Collections.singletonList(routeMapping));
+
+		when(tripManagementRepository.findById(1L)).thenReturn(Optional.of(tripEntity));
+		when(tripManagementMapper.calculateDuration(tripEntity)).thenReturn(3600L);
+		when(tripManagementMapper.calculateDistance("Chennai", "Bangalore")).thenReturn(350.0);
+
+		TripSummaryDTO result = tripManagementService.getTripSummary(1L);
+
+		assertNotNull(result);
+		assertEquals(1L, result.getTripId());
+		assertEquals("COMPLETED", result.getStatus());
+		assertEquals(350.0, result.getDistance());
+		assertEquals(3600L, result.getDuration());
+		assertEquals(1, result.getRouteMappingList().size());
+
+		verify(tripManagementRepository).findById(1L);
+	}
+
+	@Test
+	void getTripSummary_ShouldThrowException_WhenTripNotFound() {
+		when(tripManagementRepository.findById(99L)).thenReturn(Optional.empty());
+
+		assertThrows(IllegalArgumentException.class, () -> {
+			tripManagementService.getTripSummary(99L);
+		});
 	}
 }
