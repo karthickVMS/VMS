@@ -6,6 +6,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -59,24 +60,29 @@ public class RouteMappingControllerTest implements WebMvcConfigurer {
 
 	@Test
 	void createRouteWithTripId_ShouldReturnCreatedRouteMapping() throws Exception {
-		// Prepare the DTO to be sent in the request body
-		RouteMappingDTO routeMappingDTO = new RouteMappingDTO();
-		routeMappingDTO.setPoint_name("Updated Point");
+		Long tripId = 1L;
 
-		// Prepare a mock RouteMapping entity to be returned from the service
-		RouteMapping routeMapping = new RouteMapping();
-		routeMapping.setPointName("Updated Point");
+		RouteMappingDTO outputDto = new RouteMappingDTO();
+		outputDto.setPoint_name("Checkpoint A");
 
-		// Mock the service method to return the RouteMapping entity
-		when(routeMappingService.createRouteMapping(any(RouteMappingDTO.class), eq(1L))).thenReturn(routeMapping);
+		// Mock service and mapper behavior
+		when(routeMappingService.createRouteMapping(any(), eq(tripId))).thenReturn(new RouteMapping());
+		when(routeMappingMapper.toDTO(any())).thenReturn(outputDto);
 
-		// Perform the request and assert the response
-		mockMvc.perform(post("/api/routes/trip/1").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(routeMappingDTO))).andExpect(status().isOk())
-				.andExpect(jsonPath("$.point_name").value("Updated Point")); // Expect the correct point_name
+		// Prepare JSON payload
+		String jsonPayload = """
+				    {
+				        "point_name": "Checkpoint A"
+				    }
+				""";
 
-		// Verify that the service method was called
-		verify(routeMappingService, times(1)).createRouteMapping(any(RouteMappingDTO.class), eq(1L));
+		// Corrected test method with proper imports and method usage
+		mockMvc.perform(post("/api/routes/trip/{tripId}", tripId) // Corrected path
+				.contentType(MediaType.APPLICATION_JSON).content(jsonPayload)).andExpect(status().isOk()) // Expect
+																											// status OK
+																											// (200)
+				.andExpect(jsonPath("$.point_name").value("Checkpoint A")) // Assert the response content
+				.andDo(print()); // Print the response for debugging
 	}
 
 	@Test

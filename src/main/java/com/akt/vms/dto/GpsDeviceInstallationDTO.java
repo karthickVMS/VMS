@@ -1,6 +1,7 @@
 package com.akt.vms.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class GpsDeviceInstallationDTO {
 
@@ -9,12 +10,13 @@ public class GpsDeviceInstallationDTO {
 	private VehicleDTO vehicle;
 	private String installation_person;
 	private LocalDateTime installation_date;
-	private Device_status device_status;
+	private String device_status;
 	private Double signal_strength;
 	private LocalDateTime last_signal_check;
 	private Double latitude;
 	private Double longitude;
 	private String remarks;
+	private List<DeviceLocationDTO> locations;
 
 	public enum Device_status {
 		ACTIVE, INACTIVE, MALFUNCTIONING, REMOVED
@@ -60,11 +62,11 @@ public class GpsDeviceInstallationDTO {
 		this.installation_date = installation_date;
 	}
 
-	public Device_status getDevice_status() {
+	public String getDevice_status() {
 		return device_status;
 	}
 
-	public void setDevice_status(Device_status device_status) {
+	public void setDevice_status(String device_status) {
 		this.device_status = device_status;
 	}
 
@@ -106,6 +108,14 @@ public class GpsDeviceInstallationDTO {
 
 	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
+	}
+
+	public List<DeviceLocationDTO> getLocations() {
+		return locations;
+	}
+
+	public void setLocations(List<DeviceLocationDTO> locations) {
+		this.locations = locations;
 	}
 
 }

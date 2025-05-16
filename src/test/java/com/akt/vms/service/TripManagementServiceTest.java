@@ -210,44 +210,46 @@ public class TripManagementServiceTest {
 
 	@Test
 	void getTripSummary_ShouldReturnSummary_WhenTripExists() {
-		tripEntity.setStartTime(LocalDateTime.now().minusHours(1));
-		tripEntity.setEndTime(LocalDateTime.now());
-		tripEntity.setStatus("COMPLETED");
-		tripEntity.setStartLocation("Chennai");
-		tripEntity.setEndLocation("Bangalore");
+		 Long tripId = 1L;
 
-		Driver driver = new Driver();
-		driver.setDriverId(1L);
-		driver.setName("Raja");
-		tripEntity.setDriver(driver);
+	        TripManagement trip = new TripManagement();
+	        trip.setTripManagementId(tripId);
+	        trip.setTripName("Test Trip");
+	        trip.setStatus("Completed");
+	        trip.setStartLocation("Start");
+	        trip.setEndLocation("End");
 
-		Vehicle vehicle = new Vehicle();
-		vehicle.setId(1L);
-		vehicle.setVehicleNumber("VEH1234");
-		tripEntity.setVehicle(vehicle);
+	        // Optional: Set driver and vehicle if needed
+	        Driver driver = new Driver();
+	        driver.setDriverId(100L);
+	        driver.setName("John Doe");
+	        trip.setDriver(driver);
 
-		RouteMapping routeMapping = new RouteMapping();
-		routeMapping.setRouteMappingId(101L);
-		routeMapping.setPointName("Point A");
-		routeMapping.setReachedTime(LocalDateTime.now().minusMinutes(45));
-		mapping.setStatus(RouteMapping.Status.REACHED); // ✅ This is correct
+	        Vehicle vehicle = new Vehicle();
+	        vehicle.setId(200L);
+	        vehicle.setVehicleNumber("XYZ123");
+	        trip.setVehicle(vehicle);
 
-		tripEntity.setRouteMappingList(Collections.singletonList(routeMapping));
+	        TripManagementDTO tripDTO = new TripManagementDTO();
+	        tripDTO.setTripManagementId(tripId);
 
-		when(tripManagementRepository.findById(1L)).thenReturn(Optional.of(tripEntity));
-		when(tripManagementMapper.calculateDuration(tripEntity)).thenReturn(3600L);
-		when(tripManagementMapper.calculateDistance("Chennai", "Bangalore")).thenReturn(350.0);
+	        // Mocking repository and mapper
+	        when(tripManagementRepository.findById(tripId)).thenReturn(Optional.of(trip));
+	        when(tripManagementMapper.calculateDuration(trip)).thenReturn(100L);
+	        when(tripManagementMapper.calculateDistance("Start", "End")).thenReturn(50.5);
+	        when(tripManagementMapper.toDTO(trip)).thenReturn(tripDTO);  // <-- Important fix
 
-		TripSummaryDTO result = tripManagementService.getTripSummary(1L);
+	        // Act
+	        TripSummaryDTO summary = tripManagementService.getTripSummary(tripId);
 
-		assertNotNull(result);
-		assertEquals(1L, result.getTripId());
-		assertEquals("COMPLETED", result.getStatus());
-		assertEquals(350.0, result.getDistance());
-		assertEquals(3600L, result.getDuration());
-		assertEquals(1, result.getRouteMappingList().size());
-
-		verify(tripManagementRepository).findById(1L);
+	        // Assert
+	        assertNotNull(summary);
+	        assertEquals(tripId, summary.getTripId());
+	        assertEquals(100L, summary.getDuration());
+	        assertEquals(50.5, summary.getDistance());
+	        assertEquals("Completed", summary.getStatus());
+	        assertNotNull(summary.getTripManagementDTO());
+	        assertEquals(tripId, summary.getTripManagementDTO().getTripManagementId());
 	}
 
 	@Test

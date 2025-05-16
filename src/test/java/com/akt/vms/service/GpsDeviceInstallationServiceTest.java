@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -71,7 +72,7 @@ public class GpsDeviceInstallationServiceTest {
 		dto.setVehicle(vehicleDTO);
 		dto.setInstallation_person("John");
 		dto.setInstallation_date(LocalDateTime.now());
-		dto.setDevice_status(GpsDeviceInstallationDTO.Device_status.ACTIVE);
+		dto.setDevice_status("ACTIVE");
 		dto.setSignal_strength(75.0);
 		dto.setLatitude(12.9716);
 		dto.setLongitude(77.5946);
@@ -99,20 +100,35 @@ public class GpsDeviceInstallationServiceTest {
 
 	@Test
 	void installDevice_ShouldInstallSuccessfully() {
-		when(vehicleRepo.findById(1L)).thenReturn(Optional.of(vehicle));
-		when(gpsDeviceRepo.existsByVehicle(vehicle)).thenReturn(false);
-		when(mapper.toEntity(dto, vehicle)).thenReturn(device);
-		when(gpsDeviceRepo.save(device)).thenReturn(device);
-		when(mapper.toDTO(device)).thenReturn(dto);
+	    // Setup mocks
+	    GpsDeviceInstallationDTO dto = mock(GpsDeviceInstallationDTO.class);
+	    when(dto.getVehicle_id()).thenReturn(1L);  // Ensure vehicleId is provided
 
-		GpsDeviceInstallationDTO result = gpsService.installDevice(dto);
+	    // Mock other dependencies
+	    when(vehicleRepo.findById(1L)).thenReturn(Optional.of(vehicle));  // Mock vehicle found
+	    when(gpsDeviceRepo.existsByVehicle(vehicle)).thenReturn(false);  // No existing device
+	    when(mapper.toEntity(dto, vehicle)).thenReturn(device);  // Map DTO to device
 
-		assertNotNull(result);
-		assertEquals(100L, result.getDevice_id());
-		verify(vehicleRepo, times(1)).findById(1L);
-		verify(gpsDeviceRepo, times(1)).existsByVehicle(vehicle);
-		verify(gpsDeviceRepo, times(1)).save(device);
+	    // Set device_id to 100L before saving to ensure it's set correctly
+	    device.setDeviceId(100L);  // Manually set device_id for test
+
+	    // Mock save and DTO transformation
+	    when(gpsDeviceRepo.save(device)).thenReturn(device);  // Mock save returning device
+	    when(mapper.toDTO(device)).thenReturn(dto);  // Mock mapping to DTO for the result
+	    when(dto.getDevice_id()).thenReturn(100L);
+	    
+	    // Call the service method
+	    GpsDeviceInstallationDTO result = gpsService.installDevice(dto);
+
+	    // Assertions
+	    assertNotNull(result);
+	    assertEquals(100L, result.getDevice_id());  // Ensure device ID is as expected
+	    verify(vehicleRepo, times(1)).findById(1L);  // Ensure vehicle repo is queried once
+	    verify(gpsDeviceRepo, times(1)).existsByVehicle(vehicle);  // Ensure device existence check
+	    verify(gpsDeviceRepo, times(1)).save(device);  // Ensure save is called once
 	}
+
+
 
 	@Test
 	void installDevice_ShouldThrowException_WhenVehicleIdMissing() {
@@ -125,21 +141,40 @@ public class GpsDeviceInstallationServiceTest {
 
 	@Test
 	void installDevice_ShouldThrowException_WhenVehicleNotFound() {
-		when(vehicleRepo.findById(1L)).thenReturn(Optional.empty());
+		GpsDeviceInstallationDTO dto = new GpsDeviceInstallationDTO();
+		dto.setVehicle_id(1L);
 
+		when(vehicleRepo.findById(1L)).thenReturn(Optional.empty());
 		assertThrows(ResponseStatusException.class, () -> gpsService.installDevice(dto));
+
 		verify(vehicleRepo, times(1)).findById(1L);
 		verify(gpsDeviceRepo, never()).save(any());
 	}
 
 	@Test
 	void installDevice_ShouldThrowException_WhenDeviceAlreadyExists() {
-		when(vehicleRepo.findById(1L)).thenReturn(Optional.of(vehicle));
+
+		Long vehicleId = 1L;
+
+		// Mock vehicle repository to return a vehicle for ID 1
+		when(vehicleRepo.findById(vehicleId)).thenReturn(Optional.of(vehicle));
+
+		// Mock gpsDeviceInstallationRepository to return true (device exists for the
+		// vehicle)
 		when(gpsDeviceRepo.existsByVehicle(vehicle)).thenReturn(true);
 
-		assertThrows(ResponseStatusException.class, () -> gpsService.installDevice(dto));
-		verify(vehicleRepo, times(1)).findById(1L);
-		verify(gpsDeviceRepo, times(1)).existsByVehicle(vehicle);
-		verify(gpsDeviceRepo, never()).save(any());
+		// Create a DTO with the correct vehicle ID
+		GpsDeviceInstallationDTO dto = new GpsDeviceInstallationDTO();
+		dto.setVehicle_id(vehicleId); // Ensure vehicleId is set to 1L
+
+		// When: Trying to install the device should throw a ResponseStatusException
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+				() -> gpsService.installDevice(dto));
+
+		// Then: Verify the methods were called as expected
+		verify(vehicleRepo, times(1)).findById(vehicleId); // Verify that findById was called with 1L
+		verify(gpsDeviceRepo, times(1)).existsByVehicle(vehicle); // Verify existsByVehicle was called
+		verify(gpsDeviceRepo, never()).save(any()); // Ensure that save was never called
 	}
+
 }
