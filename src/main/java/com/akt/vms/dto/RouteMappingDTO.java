@@ -5,9 +5,6 @@ import java.time.LocalDateTime;
 import com.akt.vms.entity.RouteMapping.Status;
 import com.akt.vms.entity.TripManagement;
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-
 public class RouteMappingDTO {
 
 	private Long route_mapping_id;
@@ -19,9 +16,15 @@ public class RouteMappingDTO {
 
 	private TripManagementDTO tripManagementDTO;
 
-	@ManyToOne
-	@JoinColumn(name = "trip_management_id", nullable = false)
 	private TripManagement tripManagement;
+
+	public TripManagement getTripManagement() {
+		return tripManagement;
+	}
+
+	public void setTripManagement(TripManagement tripManagement) {
+		this.tripManagement = tripManagement;
+	}
 
 	public TripManagementDTO getTripManagementDTO() {
 		return tripManagementDTO;
